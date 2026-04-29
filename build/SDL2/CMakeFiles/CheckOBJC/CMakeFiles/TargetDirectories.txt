@@ -1,2 +1,0 @@
-/Users/vadim/Projects/game-vuz/build/SDL2/CMakeFiles/CheckOBJC/CMakeFiles/edit_cache.dir
-/Users/vadim/Projects/game-vuz/build/SDL2/CMakeFiles/CheckOBJC/CMakeFiles/rebuild_cache.dir

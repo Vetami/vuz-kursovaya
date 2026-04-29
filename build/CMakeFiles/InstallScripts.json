@@ -1,8 +1,0 @@
-{
-	"InstallScripts" : 
-	[
-		"/Users/vadim/Projects/game-vuz/build/cmake_install.cmake",
-		"/Users/vadim/Projects/game-vuz/build/SDL2/cmake_install.cmake"
-	],
-	"Parallel" : false
-}
