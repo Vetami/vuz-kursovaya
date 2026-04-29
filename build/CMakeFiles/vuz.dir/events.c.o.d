@@ -221,4 +221,5 @@ CMakeFiles/vuz.dir/events.c.o: /Users/vadim/Projects/game-vuz/events.c \
   /Users/vadim/Projects/game-vuz/build/SDL2/include/SDL2/SDL_locale.h \
   /Users/vadim/Projects/game-vuz/build/SDL2/include/SDL2/SDL_misc.h \
   /Users/vadim/Projects/game-vuz/defines.h \
-  /Users/vadim/Projects/game-vuz/unit.h
+  /Users/vadim/Projects/game-vuz/unit.h \
+  /Users/vadim/Projects/game-vuz/structs.h

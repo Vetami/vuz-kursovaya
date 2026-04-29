@@ -22,6 +22,7 @@ void initMouse()
 {
     mouse.mode = STANDARD;
     mouse.isHold = 0;
+    mouse.countSelectedUnits = 0;
     for(int i = 0; i < mouse.max_units; i++)
     {
         mouse.selectedUnits[i] = NULL;
@@ -61,7 +62,7 @@ void selectUnits(int sx, int sy, int ex, int ey, Unit **units, const int max_uni
         {
             if(units[i]->position.x > sx && units[i]->position.y > sy && units[i]->position.x < ex && units[i]->position.y < ey)
             {
-                printf("unitX: %d, unitY: %d, camX: %d, camY: %d, sx: %d, sy: %d, ex: %d, ey: %d\n", units[i]->position.x, units[i]->position.y, camera.x, camera.y, sx, sy, ex, ey);
+                // printf("unitX: %f, unitY: %f, camX: %d, camY: %d, sx: %d, sy: %d, ex: %d, ey: %d\n", units[i]->position.x, units[i]->position.y, camera.x, camera.y, sx, sy, ex, ey);
                 units[i]->isSelected = 1;
                 for(int j = 0; j < max_units; j++)
                 {
@@ -137,28 +138,28 @@ void processMouse()
     }
 }
 
-void processKeyboard()
+void processKeyboard(Uint64 deltaTime)
 {
     const Uint8* numkeys = SDL_GetKeyboardState(NULL);
     if(numkeys[SDL_SCANCODE_W])
     {
-        camera.y -= CAMERA_SPEED;
+        camera.y -= CAMERA_SPEED * deltaTime;
     }
     if(numkeys[SDL_SCANCODE_S])
     {
-        camera.y += CAMERA_SPEED;
+        camera.y += CAMERA_SPEED * deltaTime;
     }
     if(numkeys[SDL_SCANCODE_A])
     {
-        camera.x -= CAMERA_SPEED;
+        camera.x -= CAMERA_SPEED * deltaTime;
     }
     if(numkeys[SDL_SCANCODE_D])
     {
-        camera.x += CAMERA_SPEED;
+        camera.x += CAMERA_SPEED * deltaTime;
     }
 }
 
-void processEvents()
+void processEvents(Uint64 deltaTime)
 {
     SDL_PollEvent(&ev);
     if(ev.type == SDL_QUIT){
@@ -166,5 +167,5 @@ void processEvents()
     }
 
     processMouse();
-    processKeyboard();    
+    processKeyboard(deltaTime);    
 }

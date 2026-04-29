@@ -29,7 +29,7 @@ typedef struct {
 } Mouse;
 
 void drawSelectSquare();
-void processEvents();
+void processEvents(Uint64 deltaTime);
 void initMouse();
 
 #endif

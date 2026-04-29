@@ -223,5 +223,6 @@ CMakeFiles/vuz.dir/main.c.o: /Users/vadim/Projects/game-vuz/main.c \
   /Users/vadim/Projects/game-vuz/defines.h \
   /Users/vadim/Projects/game-vuz/map.h \
   /Users/vadim/Projects/game-vuz/unit.h \
+  /Users/vadim/Projects/game-vuz/structs.h \
   /Users/vadim/Projects/game-vuz/events.h \
   /Users/vadim/Projects/game-vuz/utils.h

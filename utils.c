@@ -12,7 +12,7 @@ void clearBackground()
 void renderPresent()
 {
     SDL_RenderPresent(renderer);
-    SDL_Delay(16);
+    // SDL_Delay(16);
 }
 
 void initializeGame()

@@ -9,7 +9,7 @@
 #define MAP_SIZE_Y 8
 #define CELL_SIZE 30
 
-#define CAMERA_SPEED 10
+#define CAMERA_SPEED 1
 
 #define BUFFER_SIZE 512
 

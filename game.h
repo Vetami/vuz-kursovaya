@@ -11,6 +11,8 @@
 SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Rect camera = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+
+Uint64 lastTime = 0;
 Uint8 running = 1;
 
 Unit *units[BUFFER_SIZE];
@@ -22,10 +24,13 @@ void game()
     spawnUnit(units, BUFFER_SIZE, Archer, "blue", 0, 40, 0);
     while(running)
     {
-        processEvents();
+        Uint64 currentTime = SDL_GetTicks64();
+        Uint64 deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+        processEvents(deltaTime);
         clearBackground();
         
-        updateUnits(units, BUFFER_SIZE);
+        updateUnits(units, BUFFER_SIZE, deltaTime);
         // drawMap(renderer, camera);
         drawUnits(units, BUFFER_SIZE);
         drawSelectSquare();
