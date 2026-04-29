@@ -1,0 +1,11 @@
+/Users/vadim/Projects/game-vuz/build/CMakeFiles/vuz.dir
+/Users/vadim/Projects/game-vuz/build/CMakeFiles/edit_cache.dir
+/Users/vadim/Projects/game-vuz/build/CMakeFiles/rebuild_cache.dir
+/Users/vadim/Projects/game-vuz/build/SDL2/CMakeFiles/sdl_headers_copy.dir
+/Users/vadim/Projects/game-vuz/build/SDL2/CMakeFiles/SDL2main.dir
+/Users/vadim/Projects/game-vuz/build/SDL2/CMakeFiles/SDL2.dir
+/Users/vadim/Projects/game-vuz/build/SDL2/CMakeFiles/SDL2-static.dir
+/Users/vadim/Projects/game-vuz/build/SDL2/CMakeFiles/SDL2_test.dir
+/Users/vadim/Projects/game-vuz/build/SDL2/CMakeFiles/uninstall.dir
+/Users/vadim/Projects/game-vuz/build/SDL2/CMakeFiles/edit_cache.dir
+/Users/vadim/Projects/game-vuz/build/SDL2/CMakeFiles/rebuild_cache.dir

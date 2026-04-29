@@ -1,0 +1,1 @@
+/usr/bin/cc  -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names -L/opt/homebrew/opt/qt/lib CMakeFiles/vuz.dir/main.c.o CMakeFiles/vuz.dir/utils.c.o CMakeFiles/vuz.dir/map.c.o CMakeFiles/vuz.dir/unit.c.o CMakeFiles/vuz.dir/events.c.o -o vuz  -Wl,-rpath,/Users/vadim/Projects/game-vuz/build/SDL2 SDL2/libSDL2-2.0.0.dylib
