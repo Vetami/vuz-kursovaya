@@ -1,9 +1,10 @@
 #include "events.h"
 SDL_Event ev;
 
-Mouse mouse = {.max_units = BUFFER_SIZE};
+Mouse mouse = {.max_units = BUFFER_SIZE, .selectedUnits = {-1}};
 SelectMode selectMode = {0, 0, 0, 0};
-Unit *selectedUnits[BUFFER_SIZE];
+extern MapCell c_map[MAP_SIZE_X * MAP_SIZE_Y];
+// Unit *selectedUnits[BUFFER_SIZE] = {-1};
 
 void drawSelectSquare()
 {
@@ -23,27 +24,15 @@ void initMouse()
     mouse.mode = STANDARD;
     mouse.isHold = 0;
     mouse.countSelectedUnits = 0;
-    for(int i = 0; i < mouse.max_units; i++)
-    {
-        mouse.selectedUnits[i] = NULL;
-    }
 }
 
-void selectUnits(int sx, int sy, int ex, int ey, Unit **units, const int max_units)
+void selectUnits(int sx, int sy, int ex, int ey, Unit **units, const int max_units, int player_id, MapCell *map, int cell_width)
 {
-    // clear selected units
-    for(int i = 0; i < max_units; i++)
-    {
-        if(units[i] != NULL)
-        {
-            units[i]->isSelected = 0;
-            mouse.selectedUnits[i] = NULL;
-        }
-    }
     sx += camera.x;
     sy += camera.y;
     ex += camera.x;
     ey += camera.y;
+    
     if(ex < sx)
     {
         int tx = ex;
@@ -56,21 +45,52 @@ void selectUnits(int sx, int sy, int ex, int ey, Unit **units, const int max_uni
         ey = sy;
         sy = ty;
     }
-    for(int i = 0; i < max_units; i++)
+    int sgx = sx;
+    int sgy = sy;
+    int egx = ex;
+    int egy = ey;
+    
+    if(sy < 0)
     {
-        if(units[i] != NULL)
+        sy = 0;
+    }
+    if(sx < 0)
+    {
+        sx = 0;
+    }
+
+    sx /= cell_width;
+    sy /= cell_width;
+    ex /= cell_width;
+    ey /= cell_width;
+
+    int dx = ex - sx;
+    int dy = ey - sy;
+
+    int offset = 3;
+    
+    for(int i = sy; i <= ey; i++)
+    {
+        for(int j = sx; j <= ex; j++)
         {
-            if(units[i]->position.x > sx && units[i]->position.y > sy && units[i]->position.x < ex && units[i]->position.y < ey)
+            int id = j + i * MAP_SIZE_X;
+            if(id >= 0 && id < MAP_SIZE_X * MAP_SIZE_Y)
             {
-                // printf("unitX: %f, unitY: %f, camX: %d, camY: %d, sx: %d, sy: %d, ex: %d, ey: %d\n", units[i]->position.x, units[i]->position.y, camera.x, camera.y, sx, sy, ex, ey);
-                units[i]->isSelected = 1;
-                for(int j = 0; j < max_units; j++)
+                for(int k = 0; k < map[id].cur_units; k++)
                 {
-                    if(mouse.selectedUnits[j] == NULL)
+                    int uid = map[id].units[k];
+                    if(units[uid]->position.x > sgx && units[uid]->position.y > sgy && units[uid]->position.x < egx && units[uid]->position.y < egy && units[uid]->player_id == player_id)
                     {
-                        mouse.countSelectedUnits++;
-                        mouse.selectedUnits[j] = units[i];
-                        break;
+                        units[uid]->isSelected = 1;
+                        for(int l = 0; l < max_units; l++)
+                        {
+                            if(mouse.selectedUnits[l] == -1)
+                            {
+                                mouse.countSelectedUnits++;
+                                mouse.selectedUnits[l] = units[uid]->unit_id;
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -78,19 +98,87 @@ void selectUnits(int sx, int sy, int ex, int ey, Unit **units, const int max_uni
     }
 }
 
-void moveUnits(Unit **units, int max_size, int x, int y)
+int selectUnit(int sx, int sy, Unit **units, const int max_units, int player_id, MapCell *map, int cell_width)
+{
+    sx += camera.x;
+    sy += camera.y;
+    int sgx = sx;
+    int sgy = sy;
+    if(sy < 0)
+    {
+        sy = 0;
+    }
+    if(sx < 0)
+    {
+        sx = 0;
+    }
+
+    sx /= cell_width;
+    sy /= cell_width;
+
+
+    int offset = 3;
+    
+    
+    int id = sx + sy * MAP_SIZE_X;
+    if(id >= 0 && id < MAP_SIZE_X * MAP_SIZE_Y)
+    {
+        for(int k = 0; k < map[id].cur_units; k++)
+        {
+            int uid = map[id].units[k];
+            if(units[uid]->position.x - offset <= sgx && units[uid]->position.y - offset <= sgy && units[uid]->position.x + units[uid]->width + offset >= sgx && units[uid]->position.y + units[uid]->height + offset >= sgy && units[uid]->player_id == player_id)
+            {
+                units[uid]->isSelected = 1;
+                for(int l = 0; l < max_units; l++)
+                {
+                    if(mouse.selectedUnits[l] == -1)
+                    {
+                        mouse.countSelectedUnits++;
+                        mouse.selectedUnits[l] = units[uid]->unit_id;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return 0;
+}
+
+void orderUnits(int *units_id, int max_size, int x, int y, UnitAction order)
 {
     x += camera.x;
     y += camera.y;
     for(int i = 0; i < max_size; i++)
     {
-        if(mouse.selectedUnits[i])
+        if(mouse.selectedUnits[i] >= 0)
         {
-            mouse.selectedUnits[i]->target.x = x;
-            mouse.selectedUnits[i]->target.y = y;
-            mouse.selectedUnits[i]->action = MOVING;
+            int uid = mouse.selectedUnits[i];
+            if(units[uid])
+            {
+                units[uid]->target.x = x;
+                units[uid]->target.y = y;
+                units[uid]->action = order;
+                // printf("i: %d inner: %d\n", i, mouse.selectedUnits[i]);
+            }
+            // printf("uid: %d\n", uid);
         }
     }
+}
+
+void clearSelectedUnits()
+{
+    for(int i = 0; i < mouse.max_units; i++)
+    {
+        mouse.selectedUnits[i] = -1;
+    }
+    for(int i = 0; i < BUFFER_SIZE; i++)
+    {
+        if(units[i] != NULL)
+        {
+            units[i]->isSelected = 0;
+        }
+    }
+    mouse.countSelectedUnits = 0;
 }
 
 void processMouse()
@@ -104,11 +192,15 @@ void processMouse()
             SDL_GetMouseState(&x, &y);
             if(ev.button.button == SDL_BUTTON_LEFT)
             {
-                mouse.mode = SELECTING;
+                clearSelectedUnits();
+                if(!selectUnit(x, y, units, BUFFER_SIZE, player.id, c_map, CELL_SIZE))
+                {
+                    mouse.mode = SELECTING;
+                }
             }
             if(ev.button.button == SDL_BUTTON_RIGHT)
             {
-                moveUnits(mouse.selectedUnits, mouse.max_units, x, y);
+                orderUnits(mouse.selectedUnits, mouse.max_units, x, y, MOVING);
                 // printf("tgx: %d, tgy: %d\n", x, y);
             }
         }
@@ -131,12 +223,14 @@ void processMouse()
         }
         if(mouse.isHold == 1 && ev.type == SDL_MOUSEBUTTONUP)
         {
-            selectUnits(selectMode.startX, selectMode.startY, selectMode.endX, selectMode.endY, units, mouse.max_units);
+            selectUnits(selectMode.startX, selectMode.startY, selectMode.endX, selectMode.endY, units, mouse.max_units, player.id, c_map, CELL_SIZE);
             mouse.isHold = 0;
             mouse.mode = STANDARD;
         }
     }
 }
+
+
 
 void processKeyboard(Uint64 deltaTime)
 {

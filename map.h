@@ -1,15 +1,17 @@
 #ifndef MAP_h_
 #define MAP_h_
 
-typedef struct 
-{
-    SDL_Rect rect;
-    SDL_Rect renderRect;
-    SDL_Color color;
-    SDL_Texture *texture;
-}
-MapCell;
+#include "defines.h"
+#include "unit.h"
+#include "structs.h"
 
-void drawMap(SDL_Renderer *renderer, const SDL_Rect camera);
+
+
+void pushId(MapCell *cell, int id);
+void initMap(MapCell *c_map);
+void drawMap(SDL_Renderer *renderer, const SDL_Rect camera, MapCell *c_map);
+void updateMap(Unit **units, int size, MapCell *map, int m_size, Bullet **bullets, int b_size);
+void clearMap(MapCell *map, int size);
+
 
 #endif

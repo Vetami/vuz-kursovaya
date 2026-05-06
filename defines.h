@@ -2,15 +2,19 @@
 #define DEFINES_h_
 
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 600
+#define SCREEN_WIDTH 2560
+#define SCREEN_HEIGHT 1440
 
-#define MAP_SIZE_X 8
-#define MAP_SIZE_Y 8
-#define CELL_SIZE 30
+#define MAP_SIZE_X 5
+#define MAP_SIZE_Y 3
+#define CELL_SIZE 800
 
 #define CAMERA_SPEED 1
 
-#define BUFFER_SIZE 512
+#define BUFFER_SIZE 512 * 8
+#define BULLET_BUFFER_SIZE BUFFER_SIZE * 4
+
+#define MAX_UNITS_IN_CELL 256
+#define MAX_BULLETS_IN_CELL 256
 
 #endif
