@@ -181,7 +181,7 @@ void clearSelectedUnits()
     mouse.countSelectedUnits = 0;
 }
 
-void processMouse()
+void processMouse(SDL_Event ev)
 {
     
     if(mouse.mode == STANDARD)
@@ -255,11 +255,15 @@ void processKeyboard(Uint64 deltaTime)
 
 void processEvents(Uint64 deltaTime)
 {
-    SDL_PollEvent(&ev);
-    if(ev.type == SDL_QUIT){
-        running = 0;
+    while(SDL_PollEvent(&ev))
+    {
+        if(ev.type == SDL_QUIT){
+            running = 0;
+        }
+        processMouse(ev);
     }
+    
+    
 
-    processMouse();
     processKeyboard(deltaTime);    
 }

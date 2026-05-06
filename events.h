@@ -33,6 +33,8 @@ typedef struct {
 
 void drawSelectSquare();
 void processEvents(Uint64 deltaTime);
+void processMouse(SDL_Event ev);
+void processKeyboard(Uint64 deltaTime);
 void initMouse();
 void clearSelectedUnits();
 int selectUnit(int sx, int sy, Unit **units, const int max_units, int player_id, MapCell *map, int cell_width);

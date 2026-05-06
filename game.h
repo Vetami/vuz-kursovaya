@@ -44,7 +44,6 @@ void game()
             spawnUnit(units, BUFFER_SIZE, INFANTRY_MAN, "blue", en_player, 100 + j * 20,  800 + i * 20);
         }
     }
-    spawnUnit(units, BUFFER_SIZE, INFANTRY_MAN, "red", player, 1280,  720);
 
     while(running)
     {
