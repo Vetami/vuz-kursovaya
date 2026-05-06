@@ -40,7 +40,7 @@ void destroyOldBullets(Bullet **bullets, int size)
     }
 }
 
-void updateBullet(Bullet *bullet, Bullet **bullets, int size, Uint64 deltaTime)
+void updateBullet(Bullet *bullet, Uint64 deltaTime)
 {
     float dx = bullet->position.x - bullet->startPosition.x;
     float dy = bullet->position.y - bullet->startPosition.y;
@@ -53,16 +53,16 @@ void updateBullet(Bullet *bullet, Bullet **bullets, int size, Uint64 deltaTime)
     }
 }
 
-void updateBullets(Bullet **bullets, int size, Uint64 deltaTime)
-{
-    for(int i = 0; i < size; i++)
-    {
-        if(bullets[i])
-        {
-            updateBullet(bullets[i], bullets, size, deltaTime);
-        }
-    }
-}
+// void updateBullets(Bullet **bullets, int size, Uint64 deltaTime)
+// {
+//     for(int i = 0; i < size; i++)
+//     {
+//         if(bullets[i])
+//         {
+//             updateBullet(bullets[i], bullets, size, deltaTime);
+//         }
+//     }
+// }
 
 void drawBullet(Bullet *bullet)
 {
@@ -103,5 +103,61 @@ void destroyBullet(Bullet **bullets, int size, int id)
     {
         free(bullets[id]);
         bullets[id] = NULL;
+    }
+}
+
+void updateBulletsSE(int start, int end, Uint64 deltaTime)
+{
+    for(int i = start; i < end; i++)
+    {
+        if(bullets[i] != NULL)
+        {
+            updateBullet(bullets[i], deltaTime);
+        }
+    }
+}
+
+void *updateBulletsWrapper(void *arg)
+{
+    ThreadData *data = (ThreadData *) arg;
+    updateBulletsSE(data->startUnit, data->endUnit, data->deltaTime);
+    return NULL;
+}
+
+void updateBulletsMT(Bullet **bullets, int size, Uint64 deltaTime)
+{
+    pthread_t thread[MAX_THREADS];
+    int unitsPerThread = size / MAX_THREADS;
+    int unitsRemain = size % MAX_THREADS;
+    ThreadData threadData[MAX_THREADS];
+    for(int i = 0; i < MAX_THREADS; i++)
+    {
+        threadData[i].deltaTime = deltaTime;
+        threadData[i].startUnit =  unitsPerThread * i;
+        threadData[i].endUnit =  unitsPerThread * i + unitsPerThread;
+        pthread_create(&thread[i], NULL, updateBulletsWrapper, &threadData[i]);
+    }
+    for(int i = 0; i < MAX_THREADS; i++)
+    {
+        pthread_join(thread[i], NULL);
+    }
+    if(unitsRemain > 0)
+    {
+        threadData[0].deltaTime = deltaTime;
+        threadData[0].startUnit =  size - unitsRemain;
+        threadData[0].endUnit =  size - 1;
+        pthread_create(&thread[0], NULL, updateBulletsWrapper, &threadData[0]);
+        pthread_join(thread[0], NULL);
+    }
+}
+
+void updateBullets(Bullet **bullets, int size, Uint64 deltaTime)
+{
+    for(int i = 0; i < size; i++)
+    {
+        if(bullets[i])
+        {
+            updateBullet(bullets[i], deltaTime);
+        }
     }
 }

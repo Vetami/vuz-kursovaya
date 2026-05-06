@@ -25,8 +25,9 @@ extern Bullet *bullets[BUFFER_SIZE * 4];
 
 void destroyBullet(Bullet **bullets, int size, int id);
 void spawnBullet(Bullet **bullets, int size, float x, float y, float dir_x, float dir_y, float velocity, float max_range, int team_id, int damage);
-void updateBullet(Bullet *bullet, Bullet **bullets, int size, Uint64 deltaTime);
+void updateBullet(Bullet *bullet, Uint64 deltaTime);
 void updateBullets(Bullet **bullets, int size, Uint64 deltaTime);
+void updateBulletsMT(Bullet **bullets, int size, Uint64 deltaTime);
 void drawBullet(Bullet *bullet);
 void drawBullets(Bullet **bullets, int size);
 void destroyOldBullets(Bullet **bullets, int size);

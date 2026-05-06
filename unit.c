@@ -29,7 +29,7 @@ void spawnUnit(Unit **unitsArray, const int size, UnitType type, const char *fac
                 unitsArray[i]->isSelected = 0;
                 unitsArray[i]->attackRange = 1080;
                 unitsArray[i]->hp = 100;
-                unitsArray[i]->damage = 50;
+                unitsArray[i]->damage = 1;
             }
             unit_counter++;
             break;
@@ -103,19 +103,19 @@ int checkAttack(Unit *unit, MapCell * map)
 
 void unitAttack(Unit *attacker, Unit *other)
 {
-    vec2 direction;
-    float dx = other->position.x - attacker->position.x;
-    float dy = other->position.y - attacker->position.y;
-    float length = sqrt(dx * dx + dy * dy);
-    if(length != 0)
-    {
-        direction.x = dx / length;
-        direction.y = dy / length;
-    }
     if(attacker->currentAttackCooldown == 0)
     {
-        spawnBullet(bullets, BULLET_BUFFER_SIZE, attacker->position.x, attacker->position.y, direction.x, direction.y, attacker->bulletSpeed, attacker->attackRange, attacker->team_id, attacker->damage);
-        attacker->currentAttackCooldown = attacker->attackCooldown;
+        vec2 direction;
+        float dx = other->position.x - attacker->position.x;
+        float dy = other->position.y - attacker->position.y;
+        float length = sqrt(dx * dx + dy * dy);
+        if(length != 0)
+        {
+            direction.x = dx / length;
+            direction.y = dy / length;
+        }
+            spawnBullet(bullets, BULLET_BUFFER_SIZE, attacker->position.x, attacker->position.y, direction.x, direction.y, attacker->bulletSpeed, attacker->attackRange, attacker->team_id, attacker->damage);
+            attacker->currentAttackCooldown = attacker->attackCooldown;
     }
 }
 
@@ -249,17 +249,15 @@ void updateUnit(Unit *unit, Uint64 deltaTime)
         {
             if(units[other] != NULL)
             {
-                // printf("aid: %d, oid: %d\n", unit->unit_id, units[other]->unit_id);
-                // destroyUnit(units, BUFFER_SIZE, other);
                 unitAttack(unit, units[other]);
             }
         }
     }
 }
 
-void updateUnits(Unit **units, const int size, Uint64 deltaTime)
+void updateUnitsSE(int start, int end, Uint64 deltaTime)
 {
-    for(int i = 0; i < size; i++)
+    for(int i = start; i < end; i++)
     {
         if(units[i] != NULL)
         {
@@ -267,6 +265,52 @@ void updateUnits(Unit **units, const int size, Uint64 deltaTime)
         }
     }
 }
+
+void *updateUnitsWrapper(void *arg)
+{
+    ThreadData *data = (ThreadData *) arg;
+    updateUnitsSE(data->startUnit, data->endUnit, data->deltaTime);
+    return NULL;
+}
+
+void updateUnitsMT(Unit **units, const int size, Uint64 deltaTime)
+{
+    pthread_t thread[MAX_THREADS];
+    int unitsPerThread = size / MAX_THREADS;
+    int unitsRemain = size % MAX_THREADS;
+    ThreadData threadData[MAX_THREADS];
+    for(int i = 0; i < MAX_THREADS; i++)
+    {
+        threadData[i].deltaTime = deltaTime;
+        threadData[i].startUnit =  unitsPerThread * i;
+        threadData[i].endUnit =  unitsPerThread * i + unitsPerThread;
+        pthread_create(&thread[i], NULL, updateUnitsWrapper, &threadData[i]);
+    }
+    for(int i = 0; i < MAX_THREADS; i++)
+    {
+        pthread_join(thread[i], NULL);
+    }
+    if(unitsRemain > 0)
+    {
+        threadData[0].deltaTime = deltaTime;
+        threadData[0].startUnit =  size - unitsRemain;
+        threadData[0].endUnit =  size - 1;
+        pthread_create(&thread[0], NULL, updateUnitsWrapper, &threadData[0]);
+        pthread_join(thread[0], NULL);
+    }
+}
+
+void updateUnits(Unit **units, const int size, Uint64 deltaTime)
+{
+    for(int i = 0; i < size; i++)
+    {
+        if(units[i])
+        {
+            updateUnit(units[i], deltaTime);
+        }
+    }
+}
+
 
 
 // int checkAllForAttack(Unit *attacker, Unit **units, int size)

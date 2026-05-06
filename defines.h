@@ -17,4 +17,6 @@
 #define MAX_UNITS_IN_CELL 800
 #define MAX_BULLETS_IN_CELL 800
 
+#define MAX_THREADS 8
+
 #endif

@@ -26,4 +26,10 @@ typedef struct
 }
 MapCell;
 
+typedef struct {
+    int startUnit;
+    int endUnit;
+    Uint64 deltaTime;
+} ThreadData;
+
 #endif

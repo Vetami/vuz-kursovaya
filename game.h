@@ -21,6 +21,8 @@ Unit *units[BUFFER_SIZE] = {NULL};
 Player player = {.id = 0, .team_id = 0};
 Player en_player = {.id = 1, .team_id = 1};
 MapCell c_map[MAP_SIZE_Y * MAP_SIZE_X];
+static int frames = 0;
+Uint64 fpsTimer = 0;
 
 void game()
 {
@@ -29,7 +31,7 @@ void game()
 
     for(int i = 0; i < 16; i++)
     {
-        for(int j = 0; j < 64; j++)
+        for(int j = 0; j <  64; j++)
         {
 
             spawnUnit(units, BUFFER_SIZE, INFANTRY_MAN, "red", player, 100 + j * 20,  100 + i * 20);
@@ -47,15 +49,17 @@ void game()
 
     while(running)
     {
+        frames++;
         Uint64 currentTime = SDL_GetTicks64();
         Uint64 deltaTime = currentTime - lastTime;
         lastTime = currentTime;
+        fpsTimer += deltaTime;
         updateMap(units, BUFFER_SIZE, c_map, MAP_SIZE_X * MAP_SIZE_Y, bullets, BULLET_BUFFER_SIZE);
         processEvents(deltaTime);
         clearBackground();
         
-        updateBullets(bullets, BULLET_BUFFER_SIZE, deltaTime);
-        updateUnits(units, BUFFER_SIZE, deltaTime);
+        updateBulletsMT(bullets, BULLET_BUFFER_SIZE, deltaTime);
+        updateUnitsMT(units, BUFFER_SIZE, deltaTime);
         destroyOldBullets(bullets, BULLET_BUFFER_SIZE);
         destroyOldUnits(units, BUFFER_SIZE);
         drawMap(renderer, camera, c_map);
@@ -64,7 +68,13 @@ void game()
         drawSelectSquare();
 
         
-        
+        if(fpsTimer > 1000)
+        {
+            printf("fps: %d\n", frames);
+            fpsTimer = 0;
+            frames = 0;
+        }
+
         renderPresent();
         SDL_Delay(1);
     }

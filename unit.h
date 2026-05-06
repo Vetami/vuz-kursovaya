@@ -2,6 +2,7 @@
 #define UNIT_h_
 
 #include <math.h>
+#include <pthread.h>
 #include <SDL2/SDL.h>
 #include "defines.h"
 #include "structs.h"
@@ -11,6 +12,7 @@
 extern SDL_Rect camera;
 extern SDL_Renderer *renderer;
 extern MapCell c_map[MAP_SIZE_Y * MAP_SIZE_X];
+
 
 typedef enum {
     Archer,
@@ -52,10 +54,13 @@ typedef struct {
     int isSelected;
 } Unit;
 
+
+
 void drawUnit(Unit *unit);
 void drawUnits(Unit **units, const int size);
 void updateUnit(Unit *unit, Uint64 deltaTime);
 void updateUnits(Unit **units, const int size, Uint64 deltaTime);
+void updateUnitsMT(Unit **units, const int size, Uint64 deltaTime);
 void spawnUnit(Unit **unitsArray, const int size, UnitType type, const char *faction, Player player, const int x, const int y);
 void deinitUnits(Unit **unitsArray, const int size);
 void destroyUnit(Unit **unitsArray, const int size, const int id);
