@@ -24,27 +24,38 @@ MapCell c_map[MAP_SIZE_Y * MAP_SIZE_X];
 static int frames = 0;
 Uint64 fpsTimer = 0;
 
+size_t totalUnitsMem = (size_t)MAP_SIZE_X * MAP_SIZE_Y * MAX_UNITS_IN_CELL * sizeof(int);
+size_t totalBulletsMem = (size_t)MAP_SIZE_X * MAP_SIZE_Y * MAX_BULLETS_IN_CELL * sizeof(int);
+
 void game()
 {
+    printf("totalUnitsMem: %zu\n", totalUnitsMem);
+    printf("totalBulletsMem: %zu\n", totalBulletsMem);
     initMouse();
     initMap(c_map);
 
     for(int i = 0; i < 16; i++)
     {
-        for(int j = 0; j <  64; j++)
+        for(int j = 0; j <  16; j++)
         {
 
             spawnUnit(units, BUFFER_SIZE, INFANTRY_MAN, "red", player, 100 + j * 20,  100 + i * 20);
         }
     }
 
-    for(int i = 0; i < 16; i++)
-    {
-        for(int j = 0; j < 64; j++)
-        {
+    // for(int i = 0; i < 16; i++)
+    // {
+    //     for(int j = 0; j < 64; j++)
+    //     {
 
-            spawnUnit(units, BUFFER_SIZE, INFANTRY_MAN, "blue", en_player, 100 + j * 20,  800 + i * 20);
-        }
+    //         spawnUnit(units, BUFFER_SIZE, INFANTRY_MAN, "blue", en_player, 100 + j * 20,  800 + i * 20);
+    //     }
+    // }
+    int *arr = (int *)malloc(sizeof(int) * 1);
+    if(!arr)
+    {
+        printf("Failed!\n");
+        exit(0);
     }
 
     while(running)
@@ -80,6 +91,7 @@ void game()
     }
     deinitUnits(units, BUFFER_SIZE);
     deInitBullets(bullets, BULLET_BUFFER_SIZE);
+    free(arr);
 }
 
 #endif

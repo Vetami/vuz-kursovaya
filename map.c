@@ -144,3 +144,4 @@ void clearMap(MapCell *map, int size)
     }
 }
 
+
